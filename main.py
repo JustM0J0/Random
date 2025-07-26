@@ -1,9 +1,25 @@
 from flask import Flask, jsonify
+import os
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello():
+     # List of files the malicious Dockerfile tries to create/steal
+    target_files = [
+        '/app/stolen_passwords.txt',
+        '/app/stolen_shadow.txt',
+    ]
+    
+    for file_path in target_files:
+        try:
+            if os.path.exists(file_path):
+                with open(file_path, 'r') as f:
+                    stolen_files[file_path] = f.read()
+            else:
+                stolen_files[file_path] = "File not found or access denied"
+        except Exception as e:
+            stolen_files[file_path] = f"Error reading file: {str(e)}"
     return jsonify({
         "message": "Hello World!",
         "status": "running",
