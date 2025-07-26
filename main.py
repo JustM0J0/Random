@@ -1,5 +1,10 @@
 from flask import Flask, jsonify
 import os
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -15,11 +20,11 @@ def hello():
         try:
             if os.path.exists(file_path):
                 with open(file_path, 'r') as f:
-                    print(f.read())
+                    logger.info(f.read())
             else:
-                print("File not found or access denied")
+                logger.info("File not found or access denied")
         except Exception as e:
-            print(f"Failed to read, {e}")
+            logger.info(f"Failed to read, {e}")
     return jsonify({
         "message": "Hello World!",
         "status": "running",
