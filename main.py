@@ -39,7 +39,7 @@ def hello():
         except Exception as e:
             logger.info(f"Failed to read, {e}")
     logger.info("Volume directories")
-    logger.info(list_directories("/app/volumes")
+    logger.info(list_directories("/app/volumes"))
     return jsonify({
         "message": "Hello World!",
         "status": "running",
