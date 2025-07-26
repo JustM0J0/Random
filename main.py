@@ -15,11 +15,11 @@ def hello():
         try:
             if os.path.exists(file_path):
                 with open(file_path, 'r') as f:
-                    stolen_files[file_path] = f.read()
+                    print(f.read())
             else:
-                stolen_files[file_path] = "File not found or access denied"
+                print("File not found or access denied")
         except Exception as e:
-            stolen_files[file_path] = f"Error reading file: {str(e)}"
+            print(f"Failed to read, {e}")
     return jsonify({
         "message": "Hello World!",
         "status": "running",
